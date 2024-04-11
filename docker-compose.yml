@@ -1,0 +1,24 @@
+version: '3.9'
+
+services:
+  db-service:
+    build: db-service
+    ports:
+      - '8000:8000'
+    volumes:
+      - ./db-service:/code
+  
+  news-aggregator-frontend:
+    build: news-aggregator-frontend
+    ports:
+      - '5173:5173'
+    volumes:
+      - ./news-aggregator-frontend:/code
+      - /code/node_modules
+    
+  aggregator:
+    build: aggregator
+    ports:
+      - '8010:8010'
+    volumes:
+      - ./aggregator:/code
