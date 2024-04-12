@@ -1,5 +1,7 @@
-*
-!.gitignore
-!docker-compose.yml
-!scripts
-!README.md
+aggregator
+annotator
+db-service
+env
+news-aggregator
+news-aggregator-frontend
+recommender
