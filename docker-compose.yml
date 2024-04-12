@@ -39,7 +39,6 @@ services:
       timeout: 10s
       retries: 5
 
-
   annotator:
     build: annotator
     ports:
@@ -52,3 +51,13 @@ services:
     environment:
       - "SUBSCRIBER_IP=annotator"
       - "PUBLISHER_IP=aggregator"
+  
+  recommender:
+    build: recommender
+    ports:
+      - '8030:8030'
+    volumes:
+      - ./recommender:/code
+    depends_on:
+      db-service:
+        condition: service_healthy
