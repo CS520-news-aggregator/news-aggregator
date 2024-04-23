@@ -5,5 +5,5 @@ gh repo list CS520-news-aggregator --limit 4000 | while read -r repo _; do
         continue
     fi
     echo "Cloning $repo"
-    gh repo clone "$repo"
+    gh repo clone "$repo" -- --recurse-submodules
 done
