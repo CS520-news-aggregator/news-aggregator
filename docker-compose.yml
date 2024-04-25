@@ -52,11 +52,23 @@ services:
     depends_on:
       aggregator:
         condition: service_healthy
+      ollama:
+        condition: service_healthy
     environment:
       - "SUBSCRIBER_IP=annotator"
       - "PUBLISHER_IP=aggregator"
       - "DB_HOST=db-service"
-  
+      - "OLLAMA_HOST=ollama"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    tty: true
+    stdin_open: true
+    
   recommender:
     build: recommender
     ports:
@@ -68,3 +80,22 @@ services:
         condition: service_healthy
     environment:
       - "DB_HOST=db-service"
+
+  ollama:
+    image: ollama/ollama:latest
+    ports:
+      - '11434:11434'
+    volumes:
+      - ./ollama:/root/.ollama
+    healthcheck:
+      test: ["CMD", "bash", "-c", "cat", "<", "/dev/null", ">", "/dev/tcp/localhost/11434"]
+      interval: 15s
+      timeout: 10s
+      retries: 5
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
