@@ -42,6 +42,7 @@ services:
     environment:
       - "DB_HOST=db-service"
       - "RUN_FIRST=false"
+      - "RUN_WORKFLOW=false"
 
   annotator:
     build: annotator
