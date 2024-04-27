@@ -57,6 +57,8 @@ services:
       - "RECOMMENDER_HOST=recommender"
       - "SCRAPER_HOST=scraper"
       - "OLLAMA_HOST=ollama"
+      - "SUBSCRIBER_IP=bundler"
+      - "PUBLISHER_IP=aggregator"
     deploy:
       resources:
         reservations:
