@@ -14,17 +14,6 @@ services:
     environment:
       - "RECOMMENDER_HOST=recommender"
 
-  news-aggregator-frontend:
-    build: news-aggregator-frontend
-    ports:
-      - '5173:5173'
-    volumes:
-      - ./news-aggregator-frontend:/code
-      - /code/node_modules
-    depends_on:
-      db-service:
-        condition: service_healthy
-
   aggregator:
     build: aggregator
     ports:
@@ -41,25 +30,35 @@ services:
       retries: 5
     environment:
       - "DB_HOST=db-service"
+      - "LLM_HOST=llm"
+      - "RECOMMENDER_HOST=recommender"
+      - "SCRAPER_HOST=scraper"
+      - "OLLAMA_HOST=ollama"
       - "RUN_FIRST=false"
       - "RUN_WORKFLOW=false"
 
-  annotator:
-    build: annotator
+  bundler:
+    build: bundler
     ports:
       - '8020:8020'
     volumes:
-      - ./annotator:/code
+      - ./bundler:/code
     depends_on:
-      aggregator:
+      db-service:
         condition: service_healthy
-      ollama:
-        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:8020"]
+      interval: 15s
+      timeout: 10s
+      retries: 5
     environment:
-      - "SUBSCRIBER_IP=annotator"
-      - "PUBLISHER_IP=aggregator"
       - "DB_HOST=db-service"
+      - "LLM_HOST=llm"
+      - "RECOMMENDER_HOST=recommender"
+      - "SCRAPER_HOST=scraper"
       - "OLLAMA_HOST=ollama"
+      - "SUBSCRIBER_IP=bundler"
+      - "PUBLISHER_IP=aggregator"
     deploy:
       resources:
         reservations:
@@ -69,7 +68,7 @@ services:
               capabilities: [gpu]
     tty: true
     stdin_open: true
-    
+
   recommender:
     build: recommender
     ports:
@@ -81,8 +80,61 @@ services:
         condition: service_healthy
     environment:
       - "DB_HOST=db-service"
+      - "LLM_HOST=llm"
+      - "RECOMMENDER_HOST=recommender"
+      - "SCRAPER_HOST=scraper"
+      - "OLLAMA_HOST=ollama"
     tty: true
     stdin_open: true
+
+  llm:
+    build: llm
+    ports:
+      - '8040:8040'
+    volumes:
+      - ./llm:/code
+    depends_on:
+      db-service:
+        condition: service_healthy
+      ollama:
+        condition: service_healthy
+    environment:
+      - "DB_HOST=db-service"
+      - "LLM_HOST=llm"
+      - "RECOMMENDER_HOST=recommender"
+      - "SCRAPER_HOST=scraper"
+      - "OLLAMA_HOST=ollama"
+    tty: true
+    stdin_open: true
+
+  scraper:
+    build: scraper
+    ports:
+      - '8050:8050'
+    volumes:
+      - ./scraper:/code
+    depends_on:
+      db-service:
+        condition: service_healthy
+    environment:
+      - "DB_HOST=db-service"
+      - "LLM_HOST=llm"
+      - "RECOMMENDER_HOST=recommender"
+      - "SCRAPER_HOST=scraper"
+      - "OLLAMA_HOST=ollama"
+    tty: true
+    stdin_open: true
+
+  news-aggregator-frontend:
+    build: news-aggregator-frontend
+    ports:
+      - '5173:5173'
+    volumes:
+      - ./news-aggregator-frontend:/code
+      - /code/node_modules
+    depends_on:
+      db-service:
+        condition: service_healthy
 
   ollama:
     image: ollama/ollama:latest

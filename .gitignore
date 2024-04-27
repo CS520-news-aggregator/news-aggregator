@@ -9,3 +9,6 @@ fastapi-models
 avatars
 avatars.zip
 ollama
+bundler
+llm
+scraper
