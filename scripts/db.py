@@ -3,6 +3,7 @@ import os
 from pymongo import MongoClient
 from tqdm import tqdm
 from bing_image_urls import bing_image_urls
+import requests
 
 config = dotenv_values(dotenv_path=os.path.join("db-service", ".env"))
 
@@ -43,7 +44,13 @@ def get_all_post_ids():
     post_collection = client["annotator"]["posts"]
     return [post["_id"] for post in post_collection.find()]
 
+def add_recomendations():
+    post_ids = get_all_post_ids()
+    requests.post(f"http://localhost:8030/recommender/add-recommendations", json={
+        "post_ids": post_ids
+    })
 
 if __name__ == "__main__":
-    # print(get_all_post_ids())
-    add_info_to_posts()
+    # post_ids = get_all_post_ids()
+    # add_info_to_posts()
+    add_recomendations()
