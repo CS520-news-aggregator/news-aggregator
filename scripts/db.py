@@ -44,13 +44,34 @@ def get_all_post_ids():
     post_collection = client["annotator"]["posts"]
     return [post["_id"] for post in post_collection.find()]
 
+
 def add_recomendations():
     post_ids = get_all_post_ids()
-    requests.post(f"http://localhost:8030/recommender/add-recommendations", json={
-        "post_ids": post_ids
-    })
+    requests.post(
+        f"http://localhost:8030/recommender/add-recommendations",
+        json={"post_ids": post_ids},
+    )
+
+
+def search_index():
+    llm_collection = client["llm"]["analyses"]
+    result = llm_collection.aggregate(
+        [
+            {
+                "$search": {
+                    "index": "llm-post-query",
+                    "text": {"query": "hamas", "path": {"wildcard": "*"}},
+                }
+            },
+            {"$limit": 5},
+            {"$project": {"_id": 0, "post_id": 1}},
+        ]
+    )
+    print(list(result))
+
 
 if __name__ == "__main__":
     # post_ids = get_all_post_ids()
     # add_info_to_posts()
-    add_recomendations()
+    # add_recomendations()
+    search_index()
