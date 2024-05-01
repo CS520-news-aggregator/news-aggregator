@@ -60,10 +60,11 @@ def search_index():
             {
                 "$search": {
                     "index": "llm-post-query",
-                    "text": {"query": "hamas", "path": {"wildcard": "*"}},
+                    "text": {"query": "video game", "path": {"wildcard": "*"}},
                 }
             },
-            {"$limit": 5},
+            {"$skip": 1},
+            {"$limit": 1},
             {"$project": {"_id": 0, "post_id": 1}},
         ]
     )
