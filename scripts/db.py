@@ -2,6 +2,7 @@ from dotenv import dotenv_values
 import os
 from pymongo import MongoClient
 from tqdm import tqdm
+from bing_image_urls import bing_image_urls
 
 config = dotenv_values(dotenv_path=os.path.join("db-service", ".env"))
 
@@ -24,6 +25,9 @@ def add_info_to_posts():
                 media = source["media"]
                 date = source["date"]
 
+                if not media.startswith("http"):
+                    media = bing_image_urls(source["link"], limit=1)[0]
+
                 post_collection.update_one(
                     {"_id": post["_id"]}, {"$set": {"media": media}}
                 )
@@ -34,9 +38,12 @@ def add_info_to_posts():
 
                 break
 
+
 def get_all_post_ids():
     post_collection = client["annotator"]["posts"]
     return [post["_id"] for post in post_collection.find()]
 
+
 if __name__ == "__main__":
-    print(get_all_post_ids())
+    # print(get_all_post_ids())
+    add_info_to_posts()
