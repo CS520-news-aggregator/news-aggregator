@@ -71,8 +71,24 @@ def search_index():
     print(list(result))
 
 
+def remove_post(post_id):
+    post_collection = client["annotator"]["posts"]
+    recommendation_collection = client["recommendation"]["recommendations"]
+    llm_collection = client["llm"]["analyses"]
+    aggregation_collection = client["aggregator"]["sources"]
+
+    recommendation_collection.delete_one({"post_id": post_id})
+    llm_collection.delete_one({"post_id": post_id})
+
+    for source_id in post_collection.find_one({"_id": post_id})["source_ids"]:
+        aggregation_collection.delete_one({"_id": source_id})
+
+    post_collection.delete_one({"_id": post_id})
+
+
 if __name__ == "__main__":
     # post_ids = get_all_post_ids()
     # add_info_to_posts()
     # add_recomendations()
-    search_index()
+    # search_index()
+    remove_post("e4313838-378a-43fb-be26-fe8f41a0eff4")
