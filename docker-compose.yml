@@ -84,6 +84,7 @@ services:
       - "RECOMMENDER_HOST=recommender"
       - "SCRAPER_HOST=scraper"
       - "OLLAMA_HOST=ollama"
+      - "RUN_FIRST=false"
     tty: true
     stdin_open: true
 

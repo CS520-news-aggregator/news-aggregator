@@ -1,7 +1,7 @@
 #!/bin/bash
 
 gh repo list CS520-news-aggregator --limit 4000 | while read -r repo _; do
-    if [[ "$repo" == "CS520-news-aggregator/news-aggregator" ||  "$repo" == "CS520-news-aggregator/annotator" ]]; then
+    if [[ "$repo" == "CS520-news-aggregator/news-aggregator" ||  "$repo" == "CS520-news-aggregator/annotator" || "$repo" == "CS520-news-aggregator/agora" ]]; then
         continue
     fi
     echo "Cloning $repo"
